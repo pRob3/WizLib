@@ -14,7 +14,7 @@ namespace WizLib_DataAccess.Data
         {
         }
 
-        //public DbSet<Category> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Book> Books { get; set; }
@@ -32,6 +32,10 @@ namespace WizLib_DataAccess.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure Fluent API
+
+            // Category table name and colum name
+            modelBuilder.Entity<Category>().ToTable("tbl_category");
+            modelBuilder.Entity<Category>().Property(c => c.Name).HasColumnName("CategoryName");
 
             // Composite key
             modelBuilder.Entity<BookAuthor>().HasKey(ba => new { ba.Author_Id, ba.Book_Id });
