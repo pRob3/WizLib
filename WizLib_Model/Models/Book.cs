@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WizLib_Model.Models
@@ -25,5 +26,7 @@ namespace WizLib_Model.Models
         [ForeignKey("Publisher")]
         public int Publisher_Id { get; set; }
         public Publisher Publisher { get; set; }
+
+        public ICollection<BookAuthor> BookAuthors { get; set; }
     }
 }
