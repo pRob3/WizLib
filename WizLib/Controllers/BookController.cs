@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using WizLib_DataAccess.Data;
@@ -19,17 +20,19 @@ namespace WizLib.Controllers
 
         public IActionResult Index()
         {
-            List<Book> objList = db.Books.ToList();
 
-            foreach (var obj in objList)
-            {
-                // Less Efficient
-                //obj.Publisher = db.Publishers.FirstOrDefault(p => p.Publisher_Id == obj.Publisher_Id);
+            // Eager loading
+            List<Book> objList = db.Books.Include(p => p.Publisher).ToList();
 
-                // More efficient
-                // Explicted loading
-                db.Entry(obj).Reference(p => p.Publisher).Load();
-            }
+            //foreach (var obj in objList)
+            //{
+            //    // Less Efficient
+            //    //obj.Publisher = db.Publishers.FirstOrDefault(p => p.Publisher_Id == obj.Publisher_Id);
+
+            //    // More efficient
+            //    // Explicted loading
+            //    db.Entry(obj).Reference(p => p.Publisher).Load();
+            //}
 
             return View(objList);
         }
@@ -88,8 +91,12 @@ namespace WizLib.Controllers
             }
             else // Edit
             {
-                obj.Book = db.Books.FirstOrDefault(u => u.Book_Id == id);
-                obj.Book.BookDetail = db.BookDetails.FirstOrDefault(x => x.BookDetail_Id == obj.Book.BookDetail_Id);
+                // Eager loading
+                obj.Book = db.Books
+                    .Include(x => x.BookDetail)
+                    .FirstOrDefault(u => u.Book_Id == id);
+
+                //obj.Book.BookDetail = db.BookDetails.FirstOrDefault(x => x.BookDetail_Id == obj.Book.BookDetail_Id);
 
                 if (obj == null)
                     return NotFound();
