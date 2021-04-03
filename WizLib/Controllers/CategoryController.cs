@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using WizLib_DataAccess.Data;
 using WizLib_Model.Models;
 
@@ -19,7 +18,6 @@ namespace WizLib.Controllers
 
         public IActionResult Index()
         {
-
             List<Category> objList = db.Categories.ToList();
 
             return View(objList);
@@ -29,7 +27,7 @@ namespace WizLib.Controllers
         {
             Category obj = new Category();
 
-            if(id == null) // New
+            if (id == null) // New
             {
                 return View(obj);
             }
@@ -50,7 +48,7 @@ namespace WizLib.Controllers
         {
             if (ModelState.IsValid)
             {
-                if(obj.Category_Id == 0) // Create
+                if (obj.Category_Id == 0) // Create
                 {
                     db.Categories.Add(obj);
                 }
@@ -68,7 +66,7 @@ namespace WizLib.Controllers
         public IActionResult Delete(int id)
         {
             var category = db.Categories.FirstOrDefault(x => x.Category_Id == id);
-            if(category != null)
+            if (category != null)
             {
                 db.Categories.Remove(category);
                 db.SaveChanges();
@@ -76,8 +74,38 @@ namespace WizLib.Controllers
             }
 
             return NotFound();
-            
-            
         }
+
+        public IActionResult CreateMultiple(int records)
+        {
+
+            List<Category> catList = new List<Category>();
+
+
+            for (int i = 1; i <= records; i++)
+            {
+                catList.Add(new Category { Name = Guid.NewGuid().ToString() });
+
+                //db.Categories.Add(new Category { Name = Guid.NewGuid().ToString() });
+            }
+            db.Categories.AddRange(catList);
+
+            db.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult RemoveMultiple(int records)
+        {
+            IEnumerable<Category> catList = db.Categories
+                .OrderByDescending(x => x.Category_Id)
+                .Take(records).ToList();
+
+            db.Categories.RemoveRange(catList);
+            db.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
