@@ -150,31 +150,31 @@ namespace WizLib.Controllers
         public IActionResult PlayGround()
         {
 
-            // Deferred Execution - Play/Test
-            var bookTemp = db.Books.FirstOrDefault();
-            bookTemp.Price = 100;
+            //// Deferred Execution - Play/Test
+            //var bookTemp = db.Books.FirstOrDefault();
+            //bookTemp.Price = 100;
 
-            var bookCollection = db.Books;
-            double totalPrice = 0;
+            //var bookCollection = db.Books;
+            //double totalPrice = 0;
 
-            foreach (var book in bookCollection)
-            {
-                totalPrice += book.Price;
-            }
+            //foreach (var book in bookCollection)
+            //{
+            //    totalPrice += book.Price;
+            //}
 
-            var bookList = db.Books.ToList();
-            foreach (var book in bookList)
-            {
-                totalPrice += book.Price;
-            }
+            //var bookList = db.Books.ToList();
+            //foreach (var book in bookList)
+            //{
+            //    totalPrice += book.Price;
+            //}
 
-            var bookCollection2 = db.Books;
-            var bookCount1 = bookCollection2.Count();
+            //var bookCollection2 = db.Books;
+            //var bookCount1 = bookCollection2.Count();
 
-            var bookCount2 = db.Books.Count();
+            //var bookCount2 = db.Books.Count();
 
 
-            // IEnumerable vs. IQueryable
+            // IEnumerable vs. IQueryable START
             
             // Returns all records from memory
             IEnumerable<Book> bookList1 = db.Books;
@@ -185,6 +185,21 @@ namespace WizLib.Controllers
             var filteredBook2 = bookList2.Where(b => b.Price > 500).ToList();
 
             // IEnumerable vs. IQueryable END
+
+
+            // Updating related data START
+
+            var bookTemp1 = db.Books.Include(b => b.BookDetail).FirstOrDefault(b => b.Book_Id == 2);
+            bookTemp1.BookDetail.NumberOfChapters = 12345;
+            db.Books.Update(bookTemp1);
+            db.SaveChanges();
+
+            var bookTemp2 = db.Books.Include(b => b.BookDetail).FirstOrDefault(b => b.Book_Id == 2);
+            bookTemp1.BookDetail.Weight = 6969;
+            db.Books.Attach(bookTemp2);
+            db.SaveChanges();
+
+            // Updating related data END
 
 
             return RedirectToAction(nameof(Index));

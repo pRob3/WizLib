@@ -13,9 +13,9 @@ namespace WizLib_Model.Models
         public int BookDetail_Id { get; set; }
 
         [Required]
-        public string NumberOfChapters { get; set; }
+        public int NumberOfChapters { get; set; }
 
-        public string NumberOfPages { get; set; }
+        public int NumberOfPages { get; set; }
 
         public double Weight { get; set; }
 
