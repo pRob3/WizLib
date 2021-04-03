@@ -187,6 +187,16 @@ namespace WizLib.Controllers
             // IEnumerable vs. IQueryable END
 
 
+            // Update State Manually - START
+
+            //var category = db.Categories.FirstOrDefault();
+            //db.Entry(category).State = EntityState.Modified;
+
+            //db.SaveChanges();
+            // Update State Manually - END
+
+
+
             // Updating related data START
 
             var bookTemp1 = db.Books.Include(b => b.BookDetail).FirstOrDefault(b => b.Book_Id == 2);
@@ -200,6 +210,8 @@ namespace WizLib.Controllers
             db.SaveChanges();
 
             // Updating related data END
+
+
 
 
             return RedirectToAction(nameof(Index));
