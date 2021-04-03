@@ -20,7 +20,6 @@ namespace WizLib.Controllers
 
         public IActionResult Index()
         {
-
             // Eager loading
             List<Book> objList = db.Books.Include(p => p.Publisher).ToList();
 
@@ -79,11 +78,9 @@ namespace WizLib.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
         public IActionResult Details(int? id)
         {
             BookVM obj = new BookVM();
-
 
             if (id == null) // New
             {
@@ -118,7 +115,6 @@ namespace WizLib.Controllers
                 BookFromDb.BookDetail_Id = obj.Book.BookDetail.BookDetail_Id;
 
                 db.SaveChanges();
-
             }
             else // Update
             {
@@ -126,11 +122,8 @@ namespace WizLib.Controllers
                 db.SaveChanges();
             }
 
-
-
             return RedirectToAction(nameof(Index));
         }
-
 
         public IActionResult Delete(int id)
         {
@@ -146,10 +139,64 @@ namespace WizLib.Controllers
             return NotFound();
         }
 
+        public IActionResult ManageAuthors(int id)
+        {
+            BookAuthorVM obj = new BookAuthorVM
+            {
+                BookAuthorList = db.BookAuthors
+                    .Include(x => x.Author).Include(x => x.Book)
+                    .Where(x => x.Book_Id == id).ToList(),
+                BookAuthor = new BookAuthor()
+                {
+                    Book_Id = id
+                },
+                Book = db.Books.FirstOrDefault(x => x.Book_Id == id)
+            };
+
+            List<int> tempListOfAssignedAuthors = obj.BookAuthorList.Select(x => x.Author_Id).ToList();
+
+            // NOT IN CLAUSE IN LINQ
+            // Get all the authors who's id is not in temp list
+            var tempList = db.Authors.Where(x => !tempListOfAssignedAuthors.Contains(x.Author_Id)).ToList();
+
+            obj.AuthorList = tempList.Select(i => new SelectListItem
+            {
+                Text = i.FullName,
+                Value = i.Author_Id.ToString()
+            });
+
+            return View(obj);
+        }
+
+        [HttpPost]
+        public IActionResult ManageAuthors(BookAuthorVM bookAuthorVM)
+        {
+            if (bookAuthorVM.BookAuthor.Book_Id != 0 && bookAuthorVM.BookAuthor.Author_Id != 0)
+            {
+                db.BookAuthors.Add(bookAuthorVM.BookAuthor);
+                db.SaveChanges();
+            }
+
+            return RedirectToAction(nameof(ManageAuthors), new { @id = bookAuthorVM.BookAuthor.Book_Id });
+        }
+
+        [HttpPost]
+        public IActionResult RemoveAuthors(int authorId, BookAuthorVM bookAuthorVM)
+        {
+            int bookId = bookAuthorVM.Book.Book_Id;
+
+            BookAuthor bookAuthor = db.BookAuthors
+                .FirstOrDefault(x => x.Author_Id == authorId && x.Book_Id == bookId);
+
+            db.BookAuthors.Remove(bookAuthor);
+            db.SaveChanges();
+
+            return RedirectToAction(nameof(ManageAuthors), new { @id = bookId });
+        }
+
 
         public IActionResult PlayGround()
         {
-
             //// Deferred Execution - Play/Test
             //var bookTemp = db.Books.FirstOrDefault();
             //bookTemp.Price = 100;
@@ -173,9 +220,8 @@ namespace WizLib.Controllers
 
             //var bookCount2 = db.Books.Count();
 
-
             // IEnumerable vs. IQueryable START
-            
+
             // Returns all records from memory
             IEnumerable<Book> bookList1 = db.Books;
             var filteredBook1 = bookList1.Where(b => b.Price > 500).ToList();
@@ -186,7 +232,6 @@ namespace WizLib.Controllers
 
             // IEnumerable vs. IQueryable END
 
-
             // Update State Manually - START
 
             //var category = db.Categories.FirstOrDefault();
@@ -194,8 +239,6 @@ namespace WizLib.Controllers
 
             //db.SaveChanges();
             // Update State Manually - END
-
-
 
             // Updating related data START
 
@@ -210,9 +253,6 @@ namespace WizLib.Controllers
             db.SaveChanges();
 
             // Updating related data END
-
-
-
 
             return RedirectToAction(nameof(Index));
         }
