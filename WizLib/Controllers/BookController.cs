@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 using WizLib_DataAccess.Data;
 using WizLib_Model.Models;
+using WizLib_Model.ViewModels;
 
 namespace WizLib.Controllers
 {
@@ -23,58 +24,60 @@ namespace WizLib.Controllers
             return View(objList);
         }
 
-        //public IActionResult Upsert(int? id)
-        //{
-        //    Author obj = new Author();
+        public IActionResult Upsert(int? id)
+        {
+            BookVM obj = new BookVM();
 
-        //    if (id == null) // New
-        //    {
-        //        return View(obj);
-        //    }
-        //    else // Edit
-        //    {
-        //        obj = db.Authors.FirstOrDefault(u => u.Author_Id == id);
+            obj.PublisherList = db.Publishers.Select(i => new SelectListItem
+            {
+                Text = i.Name,
+                Value = i.Publisher_Id.ToString()
+            });
 
-        //        if (obj == null)
-        //            return NotFound();
+            if (id == null) // New
+            {
+                return View(obj);
+            }
+            else // Edit
+            {
+                obj.Book = db.Books.FirstOrDefault(u => u.Book_Id == id);
 
-        //        return View(obj);
-        //    }
-        //}
+                if (obj == null)
+                    return NotFound();
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Upsert(Author obj)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        if (obj.Author_Id == 0) // Create
-        //        {
-        //            db.Authors.Add(obj);
-        //        }
-        //        else // Update
-        //        {
-        //            db.Authors.Update(obj);
-        //        }
-        //        db.SaveChanges();
-        //        return RedirectToAction(nameof(Index));
-        //    }
+                return View(obj);
+            }
+        }
 
-        //    return View(obj);
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Upsert(BookVM obj)
+        {
+            if (obj.Book.Book_Id == 0) // Create
+            {
+                db.Books.Add(obj.Book);
+            }
+            else // Update
+            {
+                db.Books.Update(obj.Book);
+            }
+            db.SaveChanges();
 
-        //public IActionResult Delete(int id)
-        //{
-        //    var author = db.Authors.FirstOrDefault(x => x.Author_Id == id);
-        //    if (author != null)
-        //    {
-        //        db.Authors.Remove(author);
-        //        db.SaveChanges();
-        //        return RedirectToAction(nameof(Index));
-        //    }
+            return RedirectToAction(nameof(Index));
+        }
 
-        //    return NotFound();
-        //}
+        public IActionResult Delete(int id)
+        {
+            var book = db.Books.FirstOrDefault(x => x.Book_Id == id);
+            if (book != null)
+            {
+                db.Books.Remove(book);
+                db.SaveChanges();
 
+                return RedirectToAction(nameof(Index));
+            }
+
+            return NotFound();
+        }
     }
 }
