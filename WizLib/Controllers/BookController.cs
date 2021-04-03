@@ -145,5 +145,49 @@ namespace WizLib.Controllers
 
             return NotFound();
         }
+
+
+        public IActionResult PlayGround()
+        {
+
+            // Deferred Execution - Play/Test
+            var bookTemp = db.Books.FirstOrDefault();
+            bookTemp.Price = 100;
+
+            var bookCollection = db.Books;
+            double totalPrice = 0;
+
+            foreach (var book in bookCollection)
+            {
+                totalPrice += book.Price;
+            }
+
+            var bookList = db.Books.ToList();
+            foreach (var book in bookList)
+            {
+                totalPrice += book.Price;
+            }
+
+            var bookCollection2 = db.Books;
+            var bookCount1 = bookCollection2.Count();
+
+            var bookCount2 = db.Books.Count();
+
+
+            // IEnumerable vs. IQueryable
+            
+            // Returns all records from memory
+            IEnumerable<Book> bookList1 = db.Books;
+            var filteredBook1 = bookList1.Where(b => b.Price > 500).ToList();
+
+            // Returns filtered records
+            IQueryable<Book> bookList2 = db.Books;
+            var filteredBook2 = bookList2.Where(b => b.Price > 500).ToList();
+
+            // IEnumerable vs. IQueryable END
+
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
