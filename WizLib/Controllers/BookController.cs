@@ -21,6 +21,16 @@ namespace WizLib.Controllers
         {
             List<Book> objList = db.Books.ToList();
 
+            foreach (var obj in objList)
+            {
+                // Less Efficient
+                //obj.Publisher = db.Publishers.FirstOrDefault(p => p.Publisher_Id == obj.Publisher_Id);
+
+                // More efficient
+                // Explicted loading
+                db.Entry(obj).Reference(p => p.Publisher).Load();
+            }
+
             return View(objList);
         }
 
